@@ -1,6 +1,28 @@
 #include "kernel/types.h"
 #include "user/user.h"
 
+/*
+  process1
+  +-------+
+  |fd0---------------+-----------+
+  | ^     |          |           |
+  | |     |          pipe2       pipe3
+  | |     |          |           |
+  +-+-----+          |           |
+  pipe1              |           |
+    |                |           |
+  +-------+    +-------+   +-------+
+  | |     |    |     | |   |     | |
+  | +-----pipe1+->   +-pipe2->   + |
+  | fd1   |    | fd0 fd1   | fd0 fd1
+  |       |    |       |   |       |
+  +-------+    +-------+   +-------+
+  process2     process3    process4
+
+  process fork :1 2 3 4
+  process exit :2 3 4 1
+*/
+
 void redirect(int k, int pd[]) {
 	close(k);  // close Standard input/output file. 0/1=input/output
 	dup(pd[k]); // redirect pd[k] to Standard input/output file
