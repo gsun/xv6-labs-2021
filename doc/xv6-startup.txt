@@ -1,0 +1,39 @@
+title xv6 startup
+
+participantgroup #lightgreen **kernel space**
+                    participant _entry
+                    participant start
+                    participant main
+                    participant scheduler
+                    participant usertrap
+                    end
+
+participantgroup #lightblue **user space**
+                    participant initcode
+                    participant init
+                    participant shell
+                    end
+activecolor #green
+activecolor scheduler #red
+autoactivation on
+activate _entry
+rbox over _entry:-prepare C stack
+_entry->start:
+deactivate _entry
+rbox over start:-set m-mode register
+start->main:jump to main
+deactivate start
+rbox over main:-initialization\n...\n-alloc the first process\n-set the process entry: forkret
+main->scheduler:
+deactivate main
+note over scheduler:-lock the process\n-set the process state RUNNING
+scheduler->usertrap:switch context to the process
+deactivate scheduler
+rbox over usertrap:set uservec
+usertrap->initcode:useret
+deactivate usertrap
+rbox over initcode:-exec init
+initcode->init:
+deactivate initcode
+rbox over init:-fork and exec shell
+init->shell:

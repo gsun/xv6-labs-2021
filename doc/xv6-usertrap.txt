@@ -1,0 +1,29 @@
+title xv6 usertrap 
+
+participantgroup #lightblue **user space**
+                    participant proc1
+                    participant proc2
+                    end
+participantgroup #lightgreen **kernel space**
+                    participant usertrap
+                    participant scheduler
+                    end
+activecolor #green
+activecolor scheduler #red
+autoactivation on
+activate proc1
+rbox over proc1:-state RUNNING
+rbox over proc2:-state RUNNABLE\n-suspending in usertrap
+abox over proc1:<color:#red>**INT or syscall**</color>
+proc1->usertrap:uservec
+deactivate proc1
+rbox over usertrap:-set kernelvec\n-devint or syscall\n-set proc1 state RUNNABLE
+usertrap->scheduler:switch context to kernel thread
+deactivateafter usertrap
+rbox over scheduler:-lock proc2\n-set proc2 state RUNNING
+scheduler->usertrap:switch context to proc2
+deactivateafter scheduler
+rbox over usertrap:-unlock proc2\n-set uservec
+usertrap->proc2:userret
+deactivateafter usertrap
+
